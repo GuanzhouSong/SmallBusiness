@@ -1,0 +1,17 @@
+-- 小微企业浙江省分布
+select substr(regorg,1,4) _area,count(1) _count from sm_baseinfo where isSment = '1' 
+group by _area
+ ;
+ 
+ -- 每个月存续量
+SELECT count(1) _count  FROM sm_baseinfo WHERE 
+REGSTATE IN ('K','B','A','DA','X','Q')
+and isSment = '1' 
+and DATE_FORMAT(estdate,'%Y-%m') < '2016-02'
+ 
+-- 每个月新设小微数量  
+SELECT COUNT(1) _count, DATE_FORMAT(estdate,'%Y-%m') _month FROM sm_baseinfo WHERE 
+ REGSTATE IN ('K','B','A','DA','X','Q')
+  AND isSment = '1' 
+  AND DATE_FORMAT(estdate,'%Y-%m') > '2015-12'
+  GROUP BY _month;

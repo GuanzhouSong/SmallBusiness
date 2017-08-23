@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.icinfo.cs.sccheck.mapper.PubScGroupMemberMapper" >
+  <resultMap id="BaseResultMap" type="com.icinfo.cs.sccheck.model.PubScGroupMember" >
+    <!--
+      WARNING - @frameworkgenerated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="Uid" property="uid" jdbcType="VARCHAR" />
+    <result column="GroupUid" property="groupUid" jdbcType="VARCHAR" />
+    <result column="AgentUid" property="agentUid" jdbcType="VARCHAR" />
+    <result column="AgentName" property="agentName" jdbcType="VARCHAR" />
+    <result column="AgentDeptName" property="agentDeptName" jdbcType="VARCHAR" />
+    <result column="ExpertFlag" property="expertFlag" jdbcType="CHAR" />
+    <result column="LeaderFlag" property="leaderFlag" jdbcType="CHAR" />
+  </resultMap>
+  
+   <resultMap type="com.icinfo.cs.sccheck.dto.PubScGroupMemberDto" id="PubScGroupMemberDto" extends="BaseResultMap">
+   </resultMap>
+  
+	<select id="selectPubScGroupMemberDtoList" parameterType="Map" resultMap="PubScGroupMemberDto">
+		select 
+			t.id,t.Uid,t.GroupUid,t.AgentUid,t.AgentName,t.AgentDeptName,t.ExpertFlag,t.LeaderFlag
+		from cs_pub_scgroup_member t 
+		LEFT JOIN cs_pub_scgroup p ON t.GroupUid = p.Uid
+		<where>
+			<if test="groupType !=null and groupType !='' ">
+				and p.GroupType = #{groupType}
+			</if>
+			<if test="setUserUid !=null and setUserUid !='' ">
+				and p.SetUserUid  = #{setUserUid}
+			</if>
+			<if test="groupUid !=null and groupUid !='' ">
+				and t.uid  = #{groupUid}
+			</if>
+			<if test="isVlid !=null and isVlid !='' ">
+				and p.IsVlid = #{isVlid}
+			</if>
+		</where>
+	</select>
+</mapper>

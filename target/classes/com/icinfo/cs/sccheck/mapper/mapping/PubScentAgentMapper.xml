@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.icinfo.cs.sccheck.mapper.PubScentAgentMapper" >
+  <resultMap id="BaseResultMap" type="com.icinfo.cs.sccheck.model.PubScentAgent" >
+    <!--
+      WARNING - @frameworkgenerated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="Uid" property="uid" jdbcType="VARCHAR" />
+    <result column="TaskUid" property="taskUid" jdbcType="VARCHAR" />
+    <result column="AgentUid" property="agentUid" jdbcType="VARCHAR" />
+    <result column="PriPID" property="priPID" jdbcType="VARCHAR" />
+    <result column="AdjustUserUid" property="adjustUserUid" jdbcType="VARCHAR" />
+    <result column="AdjustUserName" property="adjustUserName" jdbcType="VARCHAR" />
+    <result column="AdjustDate" property="adjustDate" jdbcType="TIMESTAMP" />
+    <result column="LeaderFlag" property="leaderFlag" jdbcType="CHAR" />
+    <result column="ExpertFlag" property="expertFlag" jdbcType="CHAR" />
+    <result column="ScentUid" property="scentUid" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="BaseResultMapDto" type="com.icinfo.cs.sccheck.dto.PubScentAgentDto" extends="BaseResultMap">
+    <result column="TaskCode" property="taskCode" jdbcType="VARCHAR" />
+    <result column="TaskName" property="taskName" jdbcType="VARCHAR" />
+    <result column="TaskState" property="taskState" jdbcType="VARCHAR" />
+    <result column="EntName" property="entName" jdbcType="VARCHAR" />
+    <result column="RegNO" property="regNO" jdbcType="VARCHAR" />
+    <result column="UniCode" property="uniCode" jdbcType="VARCHAR" />
+    <result column="AgentName" property="agentName" jdbcType="VARCHAR" />
+    <result column="AuditState" property="auditState" jdbcType="VARCHAR" />
+    <result column="RegOrgName" property="regOrgName" jdbcType="VARCHAR" />
+    <result column="LocalAdmName" property="localAdmName" jdbcType="VARCHAR" />
+    <result column="TeamLeader" property="teamLeader" jdbcType="VARCHAR" />
+    <result column="ExpertNames" property="expertNames" jdbcType="VARCHAR" />
+    <result column="AdjustUserName" property="adjustUserName" jdbcType="VARCHAR" />
+    <result column="AdjustTime" property="adjustTime" jdbcType="TIMESTAMP" />
+    <result column="CheckDeptPerson" property="checkDeptPerson" jdbcType="VARCHAR" />
+  </resultMap>
+  
+   <!-- 查询抽中当前企业的检查人员-->
+  <select id="selectEntAgents" resultType="java.lang.String" parameterType="Map"> 
+	SELECT
+		n.AgentName
+	FROM
+	cs_pub_scent_agent t
+	INNER JOIN cs_pub_scagent n
+	ON t.AgentUid = n.UID
+	where TaskUid = #{taskUid} and PriPID = #{priPID} and ScentUid = #{scentUid}
+  </select>
+  <select id="selectDeptNames" resultType="java.lang.String" parameterType="Map"> 
+	SELECT
+		n.SetDeptName
+	FROM
+	cs_pub_scent_agent t
+	INNER JOIN cs_pub_scagent n
+	ON t.AgentUid = n.UID
+	where TaskUid = #{taskUid} and PriPID = #{priPID} and ScentUid = #{scentUid}
+  </select>
+  
+  <select id="selectPubScentAgentDtoList" resultMap="BaseResultMapDto" parameterType="Map"> 
+	select 
+		t.Uid,t.taskUid,p.TaskCode,p.TaskName,e.PriPID,e.EntName,e.RegNO,
+		e.UniCode,e.RegOrgName,e.LocalAdmName,t.AuditState,t.TeamLeader,t.AdjustUserName,t.AdjustTime,t.CheckDeptPerson,t.ExpertNames
+	from cs_pub_scent_result t 
+	LEFT JOIN cs_pub_scent e ON t.MainTaskUid = e.TaskUid and t.PriPID = e.PriPID AND t.ScentUid = e.Uid 
+	LEFT JOIN pub_scdept_task k ON t.TaskUid = k.Uid
+	LEFT JOIN cs_pub_scplan_task p ON t.MainTaskUid = p.Uid
+	WHERE 
+		p.TaskState in ('02','03') 
+		and k.DeptState in ('2','3') 
+	<if test="unitDeptCode != null and unitDeptCode != ''">
+		AND k.UnitDeptCode = #{unitDeptCode}
+	</if>
+	<if test="deptTaskUid != null and deptTaskUid != ''">
+		and t.TaskUid = #{deptTaskUid}
+	</if>
+	<if test="teamLeader != null and teamLeader != ''">
+		and (t.TeamLeader like concat('%', #{teamLeader},'%') OR t.ExpertNames like concat('%', #{teamLeader},'%')) 
+	</if>
+	<if test="adjustUserName != null and adjustUserName != ''">
+		and t.AdjustUserName = #{adjustUserName}
+	</if>
+	<if test="adjustTimeStart !='' and adjustTimeStart !=null">
+		<![CDATA[
+		   and t.AdjustTime >= #{adjustTimeStart}
+		]]>
+	</if>
+	<if test="adjustTimeEnd !='' and adjustTimeEnd !=null">
+		<![CDATA[
+		   and t.AdjustTime <= #{adjustTimeEnd}
+		]]>
+	</if>
+	<if test="taskName != null and taskName != ''">
+		and p.TaskName like concat('%', #{taskName},'%')
+	</if>
+	<if test="taskCode != null and taskCode != ''">
+		and p.TaskCode like concat('%', #{taskCode},'%')
+	</if>
+	<if test="agentName != null and agentName != ''">
+		and t.CheckDeptPerson like concat('%', #{agentName},'%')
+	</if>
+	<if test="entName != null and entName != ''">
+		and e.EntName like concat('%', #{entName},'%')
+	</if>
+	<if test="regNO != null and regNO != ''">
+		and (e.RegNO like #{regNO} OR e.UniCode = #{regNO})
+	</if>
+	<if test="regOrg !='' and regOrg !=null">
+	    and e.RegOrg in (${regOrg})
+	</if>
+	<if test="localAdm !='' and localAdm !=null">
+	    and e.LocalAdm in (${localAdm})
+	</if>
+	<if test="auditState !='' and auditState !=null">
+	    and t.AuditState = ${auditState}
+	</if>
+  </select>
+</mapper>

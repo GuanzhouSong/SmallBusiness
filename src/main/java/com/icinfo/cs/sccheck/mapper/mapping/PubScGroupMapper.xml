@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.icinfo.cs.sccheck.mapper.PubScGroupMapper" >
+  <resultMap id="BaseResultMap" type="com.icinfo.cs.sccheck.model.PubScGroup" >
+    <!--
+      WARNING - @frameworkgenerated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="Uid" property="uid" jdbcType="VARCHAR" />
+    <result column="AgentNames" property="agentNames" jdbcType="VARCHAR" />
+    <result column="ExpertNames" property="expertNames" jdbcType="VARCHAR" />
+    <result column="TeamLeader" property="teamLeader" jdbcType="VARCHAR" />
+    <result column="MemberNum" property="memberNum" jdbcType="INTEGER" />
+    <result column="GroupType" property="groupType" jdbcType="CHAR" />
+    <result column="SetUserUid" property="setUserUid" jdbcType="VARCHAR" />
+    <result column="SetUserName" property="setUserName" jdbcType="VARCHAR" />
+    <result column="SetDeptCode" property="setDeptCode" jdbcType="VARCHAR" />
+    <result column="SetTime" property="setTime" jdbcType="TIMESTAMP" />
+    <result column="IsVlid" property="isVlid" jdbcType="CHAR" />
+  </resultMap>
+  
+   <resultMap id="PubScGroupDtoResultMap" type="com.icinfo.cs.sccheck.dto.PubScGroupDto" extends="BaseResultMap">
+   </resultMap>
+  
+   <select id="selectGroupList" parameterType="Map" resultMap="PubScGroupDtoResultMap">
+	SELECT 
+		Uid,AgentNames,ExpertNames,TeamLeader,MemberNum,GroupType,SetUserUid,SetUserName,SetDeptCode,SetTime
+	FROM cs_pub_scgroup
+	WHERE 1=1
+    <if test="setUserUid !=null and setUserUid != ''">
+           AND SetUserUid = #{setUserUid}
+    </if>
+    <if test="groupType !=null and groupType != ''">
+           AND GroupType = #{groupType}
+    </if>
+    <if test="isVlid !=null and isVlid != ''">
+           AND IsVlid = #{isVlid}
+    </if>
+    </select>
+  
+   <select id="selectGroupCount" resultType="java.lang.Integer" parameterType="Map">
+	SELECT 
+		count(uid)
+	FROM cs_pub_scgroup
+	WHERE 1=1
+    <if test="setUserUid !=null and setUserUid != ''">
+           AND SetUserUid = #{setUserUid}
+    </if>
+    <if test="groupType !=null and groupType != ''">
+           AND GroupType = #{groupType}
+    </if>
+    <if test="isVlid !=null and isVlid != ''">
+           AND IsVlid = #{isVlid}
+    </if>
+    </select>
+  
+</mapper>

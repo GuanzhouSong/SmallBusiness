@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.icinfo.cs.sccheck.mapper.PubScWorkPlanMapper" >
+  <resultMap id="BaseResultMap" type="com.icinfo.cs.sccheck.model.PubScWorkPlan" >
+    <!--
+      WARNING - @frameworkgenerated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="Uid" property="uid" jdbcType="VARCHAR" />
+    <result column="PlanYear" property="planYear" jdbcType="INTEGER" />
+    <result column="PlanName" property="planName" jdbcType="VARCHAR" />
+    <result column="PlanCode" property="planCode" jdbcType="VARCHAR" />
+    <result column="PlanState" property="planState" jdbcType="CHAR" />
+    <result column="PlanType" property="planType" jdbcType="CHAR" />
+    <result column="PlanStartTime" property="planStartTime" jdbcType="TIMESTAMP" />
+    <result column="PlanEndTime" property="planEndTime" jdbcType="TIMESTAMP" />
+    <result column="PlanLeadDeptcode" property="planLeadDeptcode" jdbcType="VARCHAR" />
+    <result column="PlanLeadDeptName" property="planLeadDeptName" jdbcType="VARCHAR" />
+    <result column="PlanRange" property="planRange" jdbcType="VARCHAR" />
+    <result column="PlanRemark" property="planRemark" jdbcType="VARCHAR" />
+    <result column="SetDeptCode" property="setDeptCode" jdbcType="VARCHAR" />
+    <result column="SetDeptName" property="setDeptName" jdbcType="VARCHAR" />
+    <result column="SetUserUid" property="setUserUid" jdbcType="VARCHAR" />
+    <result column="SetUserName" property="setUserName" jdbcType="VARCHAR" />
+    <result column="SetTime" property="setTime" jdbcType="TIMESTAMP" />
+    <result column="InnerCode" property="innerCode" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  
+   <resultMap id="PubScWorkPlanDtoResultMap" type="com.icinfo.cs.sccheck.dto.PubScWorkPlanDto" extends="BaseResultMap">
+	    <result column="areaCode" property="areaCode" jdbcType="VARCHAR" />
+	    <result column="deptCode" property="deptCode" jdbcType="VARCHAR" />
+	    <result column="deptName" property="deptName" jdbcType="VARCHAR" />
+	    <result column="planState01" property="planState01" jdbcType="INTEGER" />
+	    <result column="planState02" property="planState02" jdbcType="INTEGER" />
+	    <result column="planState03" property="planState03" jdbcType="INTEGER" />
+	    <result column="totalWork" property="totalWork" jdbcType="INTEGER" />
+   </resultMap>
+    
+     <!-- 分页查询 -->
+  <select id="selectPubScWorkPlanList" parameterType="Map" resultMap="PubScWorkPlanDtoResultMap">
+        SELECT
+			A.Uid,
+			A.PlanYear,
+			A.PlanName,
+			A.PlanCode,
+			A.PlanState,
+			A.PlanType,
+			A.PlanStartTime,
+			A.PlanEndTime,
+			A.PlanLeadDeptcode,
+			A.PlanLeadDeptName,
+			A.PlanRange,
+			A.PlanRemark,
+			A.SetDeptCode,
+			A.SetDeptName,
+			A.SetUserUid,
+			A.SetUserName,
+			A.SetTime
+		FROM
+			cs_pub_scwork_plan A where 1=1
+        <if test="planName !=null and planName != ''">
+            AND A.PlanName  LIKE concat('%', #{planName},'%')
+        </if>
+        <if test="searchFlag !=null and searchFlag != '' and searchFlag==0  ">
+			AND A.SetDeptCode = #{deptCode}
+		</if>
+        <if test="planCode !=null and planCode != ''">
+            AND A.PlanCode  LIKE concat('%', #{planCode},'%')
+        </if>
+        <if test="planYear !=null and planYear != ''">
+            AND A.PlanYear = #{planYear}
+        </if>
+        <if test="planStartTime !=null and planStartTime != ''">
+          <![CDATA[ AND  LEFT(A.PlanStartTime,10) >= #{planStartTime}  ]]>  
+        </if>
+        <if test="planEndTime !=null and planEndTime != ''">
+            <![CDATA[ AND  LEFT(A.PlanEndTime,10) <= #{planEndTime}  ]]> 
+        </if>
+        <if test="planLeadDeptName !=null and planLeadDeptName != ''">
+            AND  A.PlanLeadDeptName LIKE concat('%', #{planLeadDeptName},'%')
+        </if>
+        <if test="planLeadDeptcode !=null and planLeadDeptcode != ''">
+            AND  A.PlanLeadDeptcode IN (${planLeadDeptcode})
+        </if>
+        <if test="setDeptCode !=null and setDeptCode != ''">
+            AND  A.SetDeptCode IN (${setDeptCode})
+        </if>
+        <if test="planType !=null and planType != ''">
+            AND A.PlanType = #{planType}
+        </if>
+        <if test="planState !=null and planState != ''">
+            AND A.PlanState = #{planState}
+        </if>
+        <if test="setUserName !=null and setUserName != ''">
+            AND A.SetUserName  LIKE concat('%', #{setUserName},'%')
+        </if> 
+        <if test="setDeptName !=null and setDeptName != ''">
+            AND A.SetDeptName  LIKE concat('%', #{setDeptName},'%')
+        </if> 
+       <!-- 数据权限 -->
+ 	   <include refid="com.icinfo.cs.system.mapper.CSMapper.defaultByOrgCode"/>
+        ORDER BY A.PlanStartTime DESC
+    </select>
+</mapper>
